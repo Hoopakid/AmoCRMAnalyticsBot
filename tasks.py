@@ -19,7 +19,7 @@ app = Celery(
 app.conf.beat_schedule = {
     'send_message': {
         'task': 'tasks.send_message_to_user',
-        'schedule': crontab(hour=11, minute=27)
+        'schedule': crontab(hour=14, minute=20)
     }
 }
 
