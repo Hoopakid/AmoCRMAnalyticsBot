@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  bot_clock:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py
+    depends_on:
+      - celery_worker_najot
+      - celery_beat_najot
+
+  celery_worker_najot:
+    build:
+      context: .
+    command: celery -A tasks worker --loglevel=INFO
+    environment:
+      - CELERY_BROKER_URL=redis://redis_najot:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis_najot:6379/0
+    depends_on:
+      - redis_najot
+
+  celery_beat_najot:
+    build:
+      context: .
+    command: celery -A tasks beat --loglevel=INFO
+    environment:
+      - CELERY_BROKER_URL=redis://redis_najot:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis_najot:6379/0
+    depends_on:
+      - redis_najot
+
+  redis_najot:
+    container_name: redis_najot
+    image: redis:latest
