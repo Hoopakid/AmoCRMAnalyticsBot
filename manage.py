@@ -18,8 +18,10 @@ dp = Dispatcher(storage=MemoryStorage())
 MBI_CHAT_ID = os.environ.get('MBI_CHAT_ID')
 SHER_CHAT_ID = os.environ.get('SHER_CHAT_ID')
 STICKER_ID = os.environ.get('STICKER_ID')
+NAJOT_NUR_CHAT_ID = os.environ.get('NAJOT_NUR_CHAT_ID')
+NAJOT_NUR_CHAT_ID_2 = os.environ.get('NAJOT_NUR_CHAT_ID_2')
 
-all_chat_ids = [int(MBI_CHAT_ID), int(SHER_CHAT_ID)]
+all_chat_ids = [int(MBI_CHAT_ID), int(SHER_CHAT_ID), int(NAJOT_NUR_CHAT_ID_2), int(NAJOT_NUR_CHAT_ID)]
 
 
 @dp.message(CommandStart())

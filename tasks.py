@@ -6,6 +6,7 @@ from celery import Celery
 from celery.schedules import crontab
 from dotenv import load_dotenv
 from amocrm_datas import sorted_datas
+from convert_to_png_analytics import create_chart
 
 load_dotenv()
 
@@ -25,8 +26,10 @@ app.conf.beat_schedule = {
 MBI_CHAT_ID = os.environ.get('MBI_CHAT_ID')
 SHER_CHAT_ID = os.environ.get('SHER_CHAT_ID')
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
+NAJOT_NUR_CHAT_ID = os.environ.get('NAJOT_NUR_CHAT_ID')
+NAJOT_NUR_CHAT_ID_2 = os.environ.get('NAJOT_NUR_CHAT_ID_2')
 
-chat_ids = [int(MBI_CHAT_ID), int(SHER_CHAT_ID)]
+chat_ids = [int(MBI_CHAT_ID), int(SHER_CHAT_ID), int(NAJOT_NUR_CHAT_ID_2), int(NAJOT_NUR_CHAT_ID)]
 
 
 def seconds_to_hms(seconds):
@@ -40,6 +43,7 @@ def seconds_to_hms(seconds):
 @app.task()
 def send_message_to_user():
     bot_calls = sorted_datas()
+    create_chart(bot_calls, 'calls.png')
     today = (datetime.datetime.today() - datetime.timedelta(days=1)).date()
     message = f"""Xodimlarning {today} kungi hisoboti\n\n"""
     for val in bot_calls:
@@ -54,12 +58,14 @@ def send_message_to_user():
         money = f"{f_money:,.0f}".replace(',', '.')
         message += f"""👤 *{val['name']}*:\n  📞Barcha qong'iroqlar: {all_calls}\n  ☎️Davomiyligi: {hours}:{minutes}:{seconds}\n  ✅Ko'tarilgan qo'ngiroqlar: {successful_calls}\n  🔔Kiruvchi qo'ngiroqlar: {call_in}\n  🔕Chiquvchi qo'ngiroqlar: {call_out}\n  🚫Ko'tarilmagan qong'iroqlar: {unsuccessful_calls}\n  💣Qarz qo'ng'iroqlar: {qarz_calls}\n  💰Kirim: {money}\n\n"""
 
-    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
+    url = f'https://api.telegram.org/bot{BOT_TOKEN}'
     for chat_id in chat_ids:
         data = {
             'chat_id': chat_id,
             'text': message,
             'parse_mode': 'Markdown'
         }
-        requests.post(url, data)
+        requests.post(url + '/sendMessage', data)
+        with open('calls.png', 'rb') as photo:
+            requests.post(url + '/sendPhoto', data={'chat_id': chat_id}, files={'photo': photo})
     return True
