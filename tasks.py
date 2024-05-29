@@ -66,6 +66,6 @@ def send_message_to_user():
             'parse_mode': 'Markdown'
         }
         requests.post(url + '/sendMessage', data)
-        with open('calls_chart.png', 'rb') as photo:
+        with open('calls.png', 'rb') as photo:
             requests.post(url + '/sendPhoto', data={'chat_id': chat_id}, files={'photo': photo})
     return True
