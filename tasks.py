@@ -6,7 +6,7 @@ from celery import Celery
 from celery.schedules import crontab
 from dotenv import load_dotenv
 from amocrm_datas import sorted_datas
-from convert_to_png_analytics import create_chart
+from convert_to_png_analytics import plot_chart
 
 load_dotenv()
 
@@ -19,7 +19,7 @@ app = Celery(
 app.conf.beat_schedule = {
     'send_message': {
         'task': 'tasks.send_message_to_user',
-        'schedule': crontab(hour=14, minute=20)
+        'schedule': crontab(hour=14, minute=18)
     }
 }
 
@@ -43,7 +43,7 @@ def seconds_to_hms(seconds):
 @app.task()
 def send_message_to_user():
     bot_calls = sorted_datas()
-    create_chart(bot_calls, 'calls.png')
+    plot_chart(bot_calls)
     today = (datetime.datetime.today() - datetime.timedelta(days=1)).date()
     message = f"""Xodimlarning {today} kungi hisoboti\n\n"""
     for val in bot_calls:
@@ -66,6 +66,6 @@ def send_message_to_user():
             'parse_mode': 'Markdown'
         }
         requests.post(url + '/sendMessage', data)
-        with open('calls.png', 'rb') as photo:
+        with open('calls_chart.png', 'rb') as photo:
             requests.post(url + '/sendPhoto', data={'chat_id': chat_id}, files={'photo': photo})
     return True
