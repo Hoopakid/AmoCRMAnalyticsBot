@@ -1,18 +1,14 @@
-import polars as pl
-import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 
 
 def plot_chart(data):
-    df = pd.DataFrame(data)
-    names = df['name'].to_list()
-    success_counts = df['success'].to_list()
-    no_success_counts = df['no_success'].to_list()
+    names = [d['name'] for d in data]
+    success_counts = [d['success'] for d in data]
+    no_success_counts = [d['no_success'] for d in data]
     x = np.arange(len(names))
     width = 0.35
-    sns.set(style="whitegrid")
+
     fig, ax = plt.subplots(figsize=(10, 6))
     rects1 = ax.bar(x - width / 2, success_counts, width, label="Ko'tarilgan qo'ng'iroqlar", color='skyblue',
                     edgecolor='grey')
